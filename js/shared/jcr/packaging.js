@@ -34,7 +34,7 @@ const addPage = async (page, dir, prefix, zip) => {
 };
 
 // Updates the asset references to point to their respective JCR paths
-const getProcessedJcr = async (xml, pageUrl, assetFolderName, imageMappings) => {
+export const getProcessedJcr = async (xml, pageUrl, assetFolderName, imageMappings) => {
   const parser = new DOMParser();
   const doc = parser.parseFromString(xml, 'text/xml');
 

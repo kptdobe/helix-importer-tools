@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:nt="http://www.jcp.org/jcr/nt/1.0" xmlns:cq="http://www.day.com/jcr/cq/1.0" xmlns:sling="http://sling.apache.org/jcr/sling/1.0" jcr:primaryType="cq:Page">
+    <jcr:content cq:template="/libs/core/franklin/templates/page" sling:resourceType="core/franklin/components/page/v1/page" jcr:primaryType="cq:PageContent" jcr:title="Rock’n Roll Plush!" jcr:description="Plush animals with attitudes!" twitter="summary_large_image">
+        <root jcr:primaryType="nt:unstructured" sling:resourceType="core/franklin/components/root/v1/root">
+            <section sling:resourceType="core/franklin/components/section/v1/section" jcr:primaryType="nt:unstructured"> <text sling:resourceType="core/franklin/components/text/v1/text" jcr:primaryType="nt:unstructured" text="&lt;p&gt;Rock’n Roll Plush&lt;/p&gt;" />
+                <block sling:resourceType="core/franklin/components/block/v1/block" jcr:primaryType="nt:unstructured" hero_image="https://main--stini--bhellema.hlx.page/media_141b9e66743f7956337dcdd2b7cdf02ee6ec6fd82.jpeg" hero_imageAlt="Hero image" hero_text="Rock’n Roll Plush" hero_textType="h1" model="hero" name="Hero"></block>
+                <title sling:resourceType="core/franklin/components/title/v1/title" jcr:primaryType="nt:unstructured" jcr:title="2024 Stock Ready To Move" type="h2" />
+                <block_1>
+                    <item_0 sling:resourceType="core/franklin/components/block/v1/block/item" name="Card" model="card" image="https://main--stini--bhellema.hlx.page/media_16686d0383420ab6613b7f7724750e7886bae75a3.png" text="&lt;p&gt;&lt;strong&gt;Discounted!&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;2024 Stock needs to move!&lt;/p&gt;"></item_0>
+                    <item_1 sling:resourceType="core/franklin/components/block/v1/block/item" name="Card" model="card" image="https://main--stini--bhellema.hlx.page/media_155f5bb528b2327053971d5eef5276d7dca867f8f.jpeg" text="&lt;p&gt;&lt;strong&gt;Wolf Mix Master&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;2024 Wolf Mix Master is ready to move out!&lt;/p&gt;"></item_1>
+                    <item_2 sling:resourceType="core/franklin/components/block/v1/block/item" name="Card" model="card" image="https://main--stini--bhellema.hlx.page/media_1f3f98711f157e84bd39ed3ef552987b4da75ddbd.jpeg" text="&lt;p&gt;&lt;strong&gt;Mooooove Me!&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;The rockin’ cow plush is ready to go to pasture. Order now and let him loose!&lt;/p&gt;"></item_2>
+                </block_1>
+            </section>
+        </root>
+        <image jcr:primaryType="nt:unstructured" fileReference="https://main--stini--bhellema.aem.live/media_141b9e66743f7956337dcdd2b7cdf02ee6ec6fd82.jpeg" />
+    </jcr:content>
+</jcr:root>
