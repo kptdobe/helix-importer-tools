@@ -9,7 +9,7 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-
+/* global he */
 /**
  * Get the properties of a page from the jcr:content node.
  * @param {string} xml the XML string of the page
@@ -191,10 +191,7 @@ const getJcrAssetRef = (assetReference, pageUrl, assetFolderName) => {
   if (assetReference.startsWith('http')) {
     // external fileReference
     url = new URL(assetReference);
-    if (url.origin === host || url.origin === 'http://localhost:3001' || url.origin === 'https://localhost:3001') {
-      // the asset is hosted on the same server
-      jcrPath = getJcrAssetPath(url, assetFolderName);
-    }
+    jcrPath = getJcrAssetPath(url, assetFolderName);
   } else if (assetReference.startsWith('/content/dam/')) {
     // DAM fileReference
     url = new URL(`${host}${assetReference}`);
@@ -214,6 +211,46 @@ const getJcrAssetRef = (assetReference, pageUrl, assetFolderName) => {
 };
 
 /**
+ * Converts an asset reference (relative or absolute path) into a fully qualified URL
+ * based on the page URL.
+ * @param {string} assetReference - The asset reference (relative or absolute path).
+ * @param {string} pageUrl - The full URL of the current page.
+ * @returns {string|null} - The fully qualified URL or null if the input is invalid.
+ */
+function getFullAssetUrl(assetReference, pageUrl) {
+  if (!assetReference) return null;
+
+  const pageUrlObj = new URL(pageUrl); // Parse only once
+  const host = pageUrlObj.origin;
+
+  // Already a full URL, return as is
+  if (assetReference.startsWith('http://') || assetReference.startsWith('https://')) {
+    return assetReference;
+  }
+
+  // If the asset reference starts with './', it is a relative file path
+  if (assetReference.startsWith('./')) {
+    return new URL(assetReference, pageUrlObj.href).pathname;
+  }
+
+  // Absolute asset reference, appending the asset path to the host
+  return `${host}${assetReference}`;
+}
+
+/**
+ * Update the JCR asset map with the jcr asset path.
+ * @param {Map} jcrAssetMap - The map of asset references to their corresponding JCR paths
+ * @param {string} originalPath - The original asset path
+ * @param {string} updatedAssetPath - The updated jcr asset path
+ * @param {string} pageUrl - The URL of the page
+ */
+function updateJcrAssetMap(jcrAssetMap, originalPath, updatedAssetPath, pageUrl) {
+  const fullyQualifiedUrl = getFullAssetUrl(originalPath, pageUrl);
+  jcrAssetMap.delete(originalPath); // delete the original path entry first
+  jcrAssetMap.set(fullyQualifiedUrl, updatedAssetPath); // add the new mapping entry
+}
+
+/**
  * Traverse the DOM tree and update the asset references to point to the JCR paths.
  * @param {*} node - The node to traverse
  * @param {string} pageUrl - The URL of the page
@@ -224,11 +261,27 @@ export const traverseAndUpdateAssetReferences = (node, pageUrl, assetFolderName,
   if (node.nodeType === 1) { // Element node
     // eslint-disable-next-line no-restricted-syntax
     for (const attr of node.attributes) {
-      const attrValue = node.getAttribute(attr.name);
-      if (jcrAssetMap.has(attrValue)) {
-        const jcrAssetPath = getJcrAssetRef(attrValue, pageUrl, assetFolderName);
-        jcrAssetMap.set(attr.value, jcrAssetPath);
-        node.setAttribute(attr.name, jcrAssetPath);
+      // Unescape HTML entities (needs double decoding as image urls are double encoded in the xml)
+      let unescapedAttrValue = he.decode(he.decode(node.getAttribute(attr.name)));
+      let modified = false;
+      // eslint-disable-next-line
+      for (const originalPath of jcrAssetMap.keys()) {
+        if (unescapedAttrValue.includes(originalPath)) {
+          const jcrAssetPath = getJcrAssetRef(originalPath, pageUrl, assetFolderName);
+          // update the map with the new jcr path
+          updateJcrAssetMap(jcrAssetMap, originalPath, jcrAssetPath, pageUrl);
+          // update the attribute value with the new jcr path
+          unescapedAttrValue = unescapedAttrValue.replace(originalPath, jcrAssetPath);
+          modified = true;
+        }
+      }
+      // if any image path was found and updated in the attribute value, escape and set it back
+      if (modified) {
+        // while updating the attribute value, only single escaping is required
+        // as the adjusted jcr path should not contain any special characters (&, <, >, ", ', →, =)
+        const escapedAttrValue = he.encode(unescapedAttrValue);
+        // update the attribute value
+        node.setAttribute(attr.name, escapedAttrValue);
       }
     }
   }
